@@ -1,7 +1,11 @@
 import {createCard, deleteCard, likeCard, openPopupImage} from './card';
-import {cardList, content, popupAddNewCard, popupEditUserProfile, profileForm, addNewPlaceForm, openedPopup} from './index';
+import {cardList, content, popupAddNewCard, popupEditUserProfile, profileForm, addNewPlaceForm, validationConfig} from './index';
+import { updateUserProfile, addNewCard } from './api';
+import { clearValidation } from './validation';
 
 export function openPopup(popupElement) {
+    // console.log(popupElement.querySelector(validationConfig.formSelector));
+    // clearValidation(popupElement.querySelector(validationConfig.formSelector));
     popupElement.classList.add('popup_is-opened');
     popupElement.querySelector('button').focus();
     document.addEventListener('keydown', keyHandler);
@@ -10,8 +14,8 @@ export function openPopup(popupElement) {
 
 function closePopup (popupElement) {
     popupElement.classList.remove('popup_is-opened');
-    popupElement.removeEventListener('click', keyHandler, clickHandler);
-    popupElement.removeEventListener('keydown', keyHandler, clickHandler);
+    popupElement.removeEventListener('click', clickHandler);
+    popupElement.removeEventListener('keydown', keyHandler);
 }
 
 function keyHandler(evt) {
@@ -25,6 +29,7 @@ function clickHandler(evt) {
 export function handleEditProfileFormSubmit(evt) {
     evt.preventDefault(); 
 
+    updateUserProfile(profileForm.name.value, profileForm.description.value);
     content.querySelector('.profile__title').textContent = profileForm.name.value;
     content.querySelector('.profile__description').textContent =  profileForm.description.value;
     
@@ -35,12 +40,11 @@ export function handleEditProfileFormSubmit(evt) {
 export function handleAddNewPlaceFormSubmit(evt) {
     evt.preventDefault();
     
-    const cardData = {
-            title: addNewPlaceForm.placeName.value,
-            link: addNewPlaceForm.link.value
-    };
-    cardList.prepend(createCard(cardData, deleteCard, likeCard, openPopupImage));
-    
-    addNewPlaceForm.reset();
+    addNewCard(addNewPlaceForm.placeName.value, addNewPlaceForm.link.value)
+        .then(res => {
+            cardList.prepend(createCard(res, deleteCard, likeCard, openPopupImage));
+            addNewPlaceForm.reset();
+        });
+
     closePopup(popupAddNewCard);
 }
