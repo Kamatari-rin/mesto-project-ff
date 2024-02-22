@@ -1,6 +1,5 @@
 import { data } from 'autoprefixer';
-import { cardList, popupOpenImage } from './index';
-import { openPopup } from './modal';
+import { cardList } from './index';
 import { tuggleLike, deleteCardById } from './api';
 
 export function createCard(cardData, deleteCard, likeCard, openPopupImage, userId) {
@@ -58,9 +57,3 @@ function renderCard(cardElement, cardData, userId) {
     cardElement.querySelector('.card__like-button').classList.toggle('card__like-button_is-active', hasUserLike);
 }
 
-export function openPopupImage(cardData) {
-    popupOpenImage.querySelector('.popup__image').src = cardData.link;
-    popupOpenImage.querySelector('.popup__image').alt = cardData.title;
-    popupOpenImage.querySelector('.popup__caption').textContent = cardData.title;
-    openPopup(popupOpenImage);
-}

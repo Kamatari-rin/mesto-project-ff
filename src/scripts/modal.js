@@ -1,4 +1,3 @@
-import {createCard, deleteCard, likeCard, openPopupImage} from './card';
 import { validationConfig } from './index';
 import { clearValidation } from './validation';
 

@@ -1,5 +1,3 @@
-import { validationConfig } from ".";
-
 
 export function enableValidation(validationConfig) {
     const formList = Array.from(document.querySelectorAll(validationConfig.formSelector));
@@ -21,14 +19,14 @@ function setEventListener(formElement, validationConfig) {
 
     inputList.forEach(inputElement => {
         inputElement.addEventListener('input', () => {
-            checkInputValidity(formElement, inputElement);
+            checkInputValidity(formElement, inputElement, validationConfig);
             toggleSubmitButtonState(inputList, buttonElement, validationConfig);
 
         });
     });
 }
 
-function checkInputValidity(formElement, inputElement) {
+function checkInputValidity(formElement, inputElement, validationConfig) {
     if (inputElement.validity.patternMismatch) {
         inputElement.setCustomValidity(inputElement.dataset.errorMessage);
     } else inputElement.setCustomValidity("");

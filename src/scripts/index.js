@@ -1,6 +1,6 @@
 import { data } from 'autoprefixer';
 import '../pages/index.css';
-import { addCard, createCard, deleteCard, likeCard, openPopupImage } from './card';
+import { addCard, createCard, deleteCard, likeCard } from './card';
 import { openPopup, closePopup } from './modal';
 import { getUser, getInitialCards, updateUserProfile, addNewCard, updateUserAvatar } from './api';
 import { enableValidation } from './validation';
@@ -21,6 +21,8 @@ const addNewCardButton = content.querySelector('.profile__add-button');
 const editUserProfileButton = content.querySelector('.profile__edit-button');
 const avatar = content.querySelector('.profile__image');
 
+
+
 export const validationConfig = {
     formSelector: '.popup__form',
     inputSelector: '.popup__input',
@@ -30,11 +32,13 @@ export const validationConfig = {
     errorClass: 'popup__error_visible'
 };
 
+let userId;
 function loadInitialData() {
     Promise.all([getUser(), getInitialCards()]).then(result => {
         content.querySelector('.profile__title').textContent = result[0].name;
         content.querySelector('.profile__description').textContent = result[0].about;
         avatar.style.backgroundImage = `url('${result[0].avatar}')`;
+        userId = result[0]._id;
 
         showCards(result[1], result[0]._id);
     })
@@ -59,10 +63,10 @@ function handleEditProfileFormSubmit(evt) {
         .then(updatedProfile => {
             content.querySelector('.profile__title').textContent = updatedProfile.name;
             content.querySelector('.profile__description').textContent =  updatedProfile.about;
-        });
+        }).finally(profileForm.querySelector('button[type="submit"]').textContent = "Сохранить");
 
     profileForm.reset();
-    profileForm.querySelector('button[type="submit"]').textContent = "Сохранение";  
+    
     closePopup(popupEditUserProfile);
 }
 
@@ -72,22 +76,21 @@ function handleEditAvatarFormSubmit(evt) {
     updateUserAvatar(editAvatarForm.url.value)
         .then(result => {
             avatar.style.backgroundImage = `url('${result.avatar}')`;
-        });
+        }).finally(profileForm.querySelector('button[type="submit"]').textContent = "Сохранить");
+    
     editAvatarForm.reset();
-    editAvatarForm.querySelector('button[type="submit"]').textContent = "Сохранение";
+    
     closePopup(popupEditAvatar);     
 }
 
 function handleAddNewPlaceFormSubmit(evt) {
     preparingFormForSubmit(evt, addNewPlaceForm);
 
-    Promise.all([getUser(), addNewCard(addNewPlaceForm.placeName.value, addNewPlaceForm.link.value)])
-        .then(result => {
-            cardList.prepend(createCard(result[1], deleteCard, likeCard, openPopupImage, result[0]._id));
+    addNewCard(addNewPlaceForm.placeName.value, addNewPlaceForm.link.value)
+        .then(card => {
+            cardList.prepend(createCard(card, deleteCard, likeCard, openPopupImage, userId));
             addNewPlaceForm.reset();
-        });
-
-    addNewPlaceForm.querySelector('button[type="submit"]').textContent = "Сохранение";    
+        }).finally(addNewPlaceForm.querySelector('button[type="submit"]').textContent = "Сохранить");    
     closePopup(popupAddNewCard);
 }
 
@@ -100,6 +103,13 @@ function showCards (cards, userId) {
     cards.forEach(function (cardData) {
         addCard(createCard(cardData, deleteCard, likeCard, openPopupImage, userId))
     });
+}
+
+function openPopupImage(cardData) {
+    popupOpenImage.querySelector('.popup__image').src = cardData.link;
+    popupOpenImage.querySelector('.popup__image').alt = cardData.title;
+    popupOpenImage.querySelector('.popup__caption').textContent = cardData.title;
+    openPopup(popupOpenImage);
 }
 
 loadInitialData();
