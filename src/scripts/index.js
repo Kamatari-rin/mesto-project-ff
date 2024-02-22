@@ -76,7 +76,7 @@ function handleEditAvatarFormSubmit(evt) {
     updateUserAvatar(editAvatarForm.url.value)
         .then(result => {
             avatar.style.backgroundImage = `url('${result.avatar}')`;
-        }).finally(profileForm.querySelector('button[type="submit"]').textContent = "Сохранить");
+        }).finally(editAvatarForm.querySelector('button[type="submit"]').textContent = "Сохранить");
     
     editAvatarForm.reset();
     
